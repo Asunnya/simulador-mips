@@ -10,7 +10,7 @@ Utilizamos novas features que o [Python 3.10](https://www.python.org/ftp/python/
 # Modo de Execução
 
 ```
-git clone https://github.com/Pruzny/simulador-mips
+git clone https://github.com/Asunnya/simulador-mips
 cd simulador-mips
 python main.py
 ```
