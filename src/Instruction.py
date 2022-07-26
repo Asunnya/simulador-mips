@@ -58,6 +58,7 @@ class Instruction:
                 case "i":
                     if has_label_final:
                         self.immediate = str(Simulador.labels[instruction_in_form_list[-1]] - pos - 1)
+                        self.rs = instruction_in_form_list[2 + has_label_start]
                     else:
                         immediate = instruction_in_form_list[-1]
                         if name == "lw" or name == "sw":
@@ -119,6 +120,7 @@ class Instruction:
                 self.rs_value = Info.REGS[self.rs]
             if self.rt is not None:
                 self.rt_value = Info.REGS[self.rt]
+            self.check_hazard()
             if self.name == "beq":
                 self.result = self.rs_value == self.rt_value
             if self.name == "bne":
@@ -136,8 +138,8 @@ class Instruction:
                     self.result = ""
                     for bit1, bit2 in zip(self.rs_value, self.rt_value):
                         self.result += "1" if bit1 != "0" and bit2 != "0" else "0"
-                # case "jr":
-                #
+                case "jr":
+                    self.result = hex_to_dec(self.rs_value)
                 case "lw":
                     self.result = Info.DATA[dec_to_hex(hex_to_dec(self.rs_value), 4)]
                 case "or":
@@ -151,12 +153,14 @@ class Instruction:
                     offset = int(self.immediate) if 0 <= int(self.immediate) <= 8 else 8
                     self.result = "0" * offset + self.rs_value[:8 - offset]
                 case "sub":
-                    value = hex_to_dec(self.rs_value) + hex_to_dec(self.rt_value)
+                    value = hex_to_dec(self.rs_value) - hex_to_dec(self.rt_value)
                     self.result = dec_to_hex(value, 8) if value >= 0 else dec_to_hex(0, 8)
                 case "li":
                     self.result = dec_to_hex(int(self.immediate), 8)
-        except:
-            print("Verifique o codigo, nao foi possivel calcular, verifique os registradores")
+        except Exception as ex:
+            raise ex
+            print(f"Ocorreu um erro ao  calcular a instrucao {self.name}, Verifique o codigo, principalmente, verifique os registradores")
+
 
     def mem(self) -> None:
         self.check_hazard()
